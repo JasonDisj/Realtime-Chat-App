@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import ScrollToBottom from "react-scroll-to-bottom";
 
 function Chats(props) {
   const [message, setMessage] = useState("");
@@ -19,6 +19,7 @@ function Chats(props) {
 
       await props.socket.emit("send_message", messageData);
       setMessageList((prev) => [...prev, messageData]);
+      setMessage("");
     }
   };
 
@@ -34,31 +35,39 @@ function Chats(props) {
         <p>Live Chat</p>
       </div>
       <div className="chat-body">
-        {messageList.map((messageContent) => {
-          return (
-            <div
-              className="message"
-              id={props.username === messageContent.username ? "you" : "other"}
-            >
-              <div>
-                <div className="message-content">
-                  <p>{messageContent.message}</p>
-                </div>
-                <div className="message-meta">
-                  <p id="time">{messageContent.time}</p>
-                  <p id="author">{messageContent.username}</p>
+        <ScrollToBottom className="message-container">
+          {messageList.map((messageContent) => {
+            return (
+              <div
+                className="message"
+                id={
+                  props.username === messageContent.username ? "you" : "other"
+                }
+              >
+                <div>
+                  <div className="message-content">
+                    <p>{messageContent.message}</p>
+                  </div>
+                  <div className="message-meta">
+                    <p id="time">{messageContent.time}</p>
+                    <p id="author">{messageContent.username}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </ScrollToBottom>
       </div>
       <div className="chat-footer">
         <input
           type="text"
+          value={message}
           placeholder="Type a message"
           onChange={(e) => {
             setMessage(e.target.value);
+          }}
+          onKeyPress={(e) => {
+            e.key === "Enter" && sendMessage();
           }}
         ></input>
         <button onClick={sendMessage}>&#9658;</button>
